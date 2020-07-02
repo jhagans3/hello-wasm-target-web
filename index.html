@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>My Wasm Project</title>
+</head>
+
+<body>
+    <!--
+        For simplicity, we'll add a class declaration to the global namespace.
+        The goal, from rust, is to create this class, call a method, and get/set a property.
+    -->
+    <script>
+        class Coordinate {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+            }
+
+            printValues() {
+                return `(x:${this.x} y:${this.y})`;
+            }
+        }
+    </script>
+    <script type="module">
+        // Importing WASM as a JS module requires us to call an init function provided by the default export.
+        // This is planned to be changed in the future.
+        // import { default as wasm, greet } from "./pkg/hello_wasm_target_web.js";
+        import * as wasm from "./pkg/hello_wasm_target_web.js";
+
+        wasm.default().then((module) => {
+            // The boiler plate project comes with a `greet` function that calls:
+            // `alert("Hello, hello-wasm!");`
+            wasm.greet();
+            wasm.char_example("R");
+            wasm.string_example("Jane");
+            wasm.str_example("John");
+            wasm.number_example(28);
+            wasm.mixed_array_example([2, null, undefined, "Hola", true]);
+            wasm.typed_array_example([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+            wasm.option_example();
+            // Uncaught (in promise) Look Pa, I'm throwing a JS error!
+            // wasm.result_example();
+
+            // Enum \\
+            let rustEnum = wasm.ExampleEnum.Yes;
+            console.log(wasm.verify_enum_choice(rustEnum));
+
+            // Struct \\
+            let rustStruct = wasm.ExampleStruct.new(6);
+            // this will contain a pointer
+            console.log(rustStruct);
+            console.log(rustStruct.value);
+
+            rustStruct.write_method(200);
+            console.log(rustStruct.read_method());
+
+            let newRustStruct = rustStruct.transfer_ownership();
+            // rustStruct is now invalid. An error will throw.
+            // Uncaught (in promise) Error: null pointer passed to rust
+            // rustStruct.read_method();
+
+            wasm.manual_bindings_example();
+        });
+    </script>
+</body>
+
+</html>
