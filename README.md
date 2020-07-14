@@ -1,5 +1,7 @@
+source:
 https://blog.logrocket.com/getting-started-with-webassembly-and-rust/
-
+and
+https://github.com/dmilford/rust-3d-demo
 
 ### 🛠️ Build with `wasm-pack build`
 
